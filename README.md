@@ -7,7 +7,20 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Minimum Supported Rust Version](https://img.shields.io/badge/MSRV-1.65.0-blue.svg)](https://github.com/jrrembert/luhn_rs)
 
-### Usage
+A Rust implementation of the Luhn algorithm for generating and validating numbers.
+
+## Features
+- Generate Luhn numbers
+- Validate Luhn numbers
+- Generate random valid Luhn numbers
+
+## Installation
+Add this to your `Cargo.toml`:
+```toml
+[dependencies]
+luhn_rs = "0.1.0"
+
+## Usage
 
 
 
@@ -18,4 +31,7 @@ $ cargo doc --no-deps --open
 
 # run tests
 $ cargo test
+
+# run benchmarks
+$ cargo bench
 ```
