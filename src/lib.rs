@@ -433,9 +433,9 @@ mod tests {
             let expected = iterations / 10;
             let min_threshold = expected * 6 / 10;
 
-            println!("\nExpected count per digit: {}", expected);
-            println!("Minimum threshold (60%): {}\n", min_threshold);
-            println!("Actual counts per digit:");
+            // println!("\nExpected count per digit: {}", expected);
+            // println!("Minimum threshold (60%): {}\n", min_threshold);
+            // println!("Actual counts per digit:");
             for (digit, count) in counts.iter().enumerate() {
                 println!(
                     "Digit {}: {} {}",
@@ -448,7 +448,7 @@ mod tests {
                     }
                 );
             }
-            println!("");
+            // println!("");
 
             for count in counts.iter() {
                 assert!(*count > (expected * 6 / 10)); // Within 40% below expected
