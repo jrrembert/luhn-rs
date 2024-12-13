@@ -1,9 +1,9 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use luhn_rs::{generate, validate, random, GenerateOptions};
+use luhn_rs::{generate, random, validate, GenerateOptions};
 
 fn benchmark_generate(c: &mut Criterion) {
     let mut group = c.benchmark_group("generate");
-    
+
     // Benchmark different input lengths
     group.bench_function("generate_short", |b| {
         b.iter(|| generate(black_box("1234"), None))
@@ -22,7 +22,9 @@ fn benchmark_generate(c: &mut Criterion) {
         b.iter(|| {
             generate(
                 black_box("1234567890"),
-                Some(GenerateOptions { checksum_only: true })
+                Some(GenerateOptions {
+                    checksum_only: true,
+                }),
             )
         })
     });
@@ -32,7 +34,7 @@ fn benchmark_generate(c: &mut Criterion) {
 
 fn benchmark_validate(c: &mut Criterion) {
     let mut group = c.benchmark_group("validate");
-    
+
     // Benchmark different input lengths
     group.bench_function("validate_short", |b| {
         b.iter(|| validate(black_box("12344")))
@@ -60,19 +62,13 @@ fn benchmark_validate(c: &mut Criterion) {
 
 fn benchmark_random(c: &mut Criterion) {
     let mut group = c.benchmark_group("random");
-    
+
     // Benchmark different lengths
-    group.bench_function("random_short", |b| {
-        b.iter(|| random(black_box("5")))
-    });
+    group.bench_function("random_short", |b| b.iter(|| random(black_box("5"))));
 
-    group.bench_function("random_medium", |b| {
-        b.iter(|| random(black_box("10")))
-    });
+    group.bench_function("random_medium", |b| b.iter(|| random(black_box("10"))));
 
-    group.bench_function("random_long", |b| {
-        b.iter(|| random(black_box("20")))
-    });
+    group.bench_function("random_long", |b| b.iter(|| random(black_box("20"))));
 
     group.finish();
 }

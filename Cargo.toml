@@ -2,6 +2,9 @@
 name = "luhn_rs"
 rust-version = "1.65.0"
 edition = "2021"
+version = "0.2.0"
+authors = ["Ryan Rembert <j.ryan.rembert@gmail.com>"]
+
 
 [dependencies]
 rand = "0.8"
