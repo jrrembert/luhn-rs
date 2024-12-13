@@ -22,7 +22,7 @@ use std::error::Error;
 use std::fmt;
 
 /// Configuration options for generating Luhn numbers.
-#[derive(Default, Clone)]  // Added Clone here
+#[derive(Default, Clone)] // Added Clone here
 pub struct GenerateOptions {
     /// If true, returns only the checksum digit.
     /// If false, returns the original number with the checksum digit appended.
@@ -165,10 +165,10 @@ pub fn generate(value: &str, options: Option<GenerateOptions>) -> Result<String,
     handle_errors(value)?;
 
     let checksum = generate_checksum(value);
-    
+
     Ok(match options {
         Some(opts) if opts.checksum_only => checksum.to_string(),
-        _ => format!("{}{}", value, checksum)
+        _ => format!("{}{}", value, checksum),
     })
 }
 
@@ -202,7 +202,7 @@ pub fn validate(value: &str) -> Result<bool, LuhnError> {
 
     if value.len() == 1 {
         return Err(LuhnError::InvalidLength(
-            "string must be longer than 1 character".to_string()
+            "string must be longer than 1 character".to_string(),
         ));
     }
 
@@ -237,34 +237,35 @@ pub fn validate(value: &str) -> Result<bool, LuhnError> {
 pub fn random(length: &str) -> Result<String, LuhnError> {
     handle_errors(length)?;
 
-    let length_as_int: usize = length.parse()
+    let length_as_int: usize = length
+        .parse()
         .map_err(|_| LuhnError::ParseError("failed to parse length".to_string()))?;
 
     if length_as_int > 100 {
         return Err(LuhnError::InvalidLength(
-            "string must be less than 100 characters".to_string()
+            "string must be less than 100 characters".to_string(),
         ));
     }
 
     if length_as_int < 2 {
         return Err(LuhnError::InvalidLength(
-            "string must be greater than 1".to_string()
+            "string must be greater than 1".to_string(),
         ));
     }
 
     use rand::Rng;
     let mut rng = rand::thread_rng();
-    
+
     let mut random = String::with_capacity(length_as_int - 1);
 
     loop {
         random.clear();
-        
+
         // Generate all digits randomly (0-9)
         for _ in 0..(length_as_int - 1) {
             random.push(char::from_digit(rng.gen_range(0..10), 10).unwrap());
         }
-        
+
         // Add checksum and check if valid
         if let Ok(result) = generate(&random, None) {
             if validate(&result).unwrap_or(false) {
@@ -287,9 +288,18 @@ mod tests {
         fn test_error_cases() {
             assert_eq!(generate("", None).unwrap_err(), LuhnError::EmptyString);
             assert_eq!(generate("1a", None).unwrap_err(), LuhnError::NonNumeric);
-            assert_eq!(generate(" 123 ", None).unwrap_err(), LuhnError::ContainsSpaces);
-            assert_eq!(generate("-123", None).unwrap_err(), LuhnError::NegativeNumber);
-            assert_eq!(generate("123.45", None).unwrap_err(), LuhnError::FloatingPoint);
+            assert_eq!(
+                generate(" 123 ", None).unwrap_err(),
+                LuhnError::ContainsSpaces
+            );
+            assert_eq!(
+                generate("-123", None).unwrap_err(),
+                LuhnError::NegativeNumber
+            );
+            assert_eq!(
+                generate("123.45", None).unwrap_err(),
+                LuhnError::FloatingPoint
+            );
         }
 
         #[test]
@@ -301,7 +311,9 @@ mod tests {
 
         #[test]
         fn test_generate_with_checksum_false() {
-            let options = Some(GenerateOptions { checksum_only: false });
+            let options = Some(GenerateOptions {
+                checksum_only: false,
+            });
             assert_eq!(generate("1", options.clone()).unwrap(), "18");
             assert_eq!(generate("12", options.clone()).unwrap(), "125");
             assert_eq!(generate("123", options.clone()).unwrap(), "1230");
@@ -310,13 +322,18 @@ mod tests {
             assert_eq!(generate("123456", options.clone()).unwrap(), "1234566");
             assert_eq!(generate("1234567", options.clone()).unwrap(), "12345674");
             assert_eq!(generate("12345678", options.clone()).unwrap(), "123456782");
-            assert_eq!(generate("123456789", options.clone()).unwrap(), "1234567897");
+            assert_eq!(
+                generate("123456789", options.clone()).unwrap(),
+                "1234567897"
+            );
             assert_eq!(generate("7992739871", options).unwrap(), "79927398713");
         }
 
         #[test]
         fn test_generate_with_checksum_only() {
-            let options = Some(GenerateOptions { checksum_only: true });
+            let options = Some(GenerateOptions {
+                checksum_only: true,
+            });
             assert_eq!(generate("1", options.clone()).unwrap(), "8");
             assert_eq!(generate("12", options.clone()).unwrap(), "5");
             assert_eq!(generate("123", options.clone()).unwrap(), "0");
@@ -420,8 +437,16 @@ mod tests {
             println!("Minimum threshold (60%): {}\n", min_threshold);
             println!("Actual counts per digit:");
             for (digit, count) in counts.iter().enumerate() {
-                println!("Digit {}: {} {}", digit, count, 
-                    if *count < min_threshold { "<!- BELOW THRESHOLD" } else { "" });
+                println!(
+                    "Digit {}: {} {}",
+                    digit,
+                    count,
+                    if *count < min_threshold {
+                        "<!- BELOW THRESHOLD"
+                    } else {
+                        ""
+                    }
+                );
             }
             println!("");
 
@@ -432,4 +457,3 @@ mod tests {
         }
     }
 }
-
