@@ -18,12 +18,13 @@ A Rust implementation of the Luhn algorithm for generating and validating number
 Add this to your `Cargo.toml`:
 ```toml
 [dependencies]
-luhn_rs = "0.1.0"
-
+luhn_rs = "0.2.0"
+```
 ## Usage
 
-
-
+```rust
+use luhn_rs::{generate, validate, random};
+```
 
 ```
 # view docs
