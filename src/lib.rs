@@ -18,6 +18,9 @@
 //! assert!(is_valid);
 //! ```
 
+use std::error::Error;
+use std::fmt;
+
 /// Configuration options for generating Luhn numbers.
 #[derive(Default, Clone)]  // Added Clone here
 pub struct GenerateOptions {
@@ -25,6 +28,40 @@ pub struct GenerateOptions {
     /// If false, returns the original number with the checksum digit appended.
     pub checksum_only: bool,
 }
+
+#[derive(Debug, PartialEq)]
+pub enum LuhnError {
+    /// Input string is empty
+    EmptyString,
+    /// Input contains whitespace
+    ContainsSpaces,
+    /// Input contains a negative number
+    NegativeNumber,
+    /// Input contains a floating point number
+    FloatingPoint,
+    /// Input contains non-numeric characters
+    NonNumeric,
+    /// Input length is invalid (too short or too long)
+    InvalidLength(String),
+    /// Error parsing number
+    ParseError(String),
+}
+
+impl fmt::Display for LuhnError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            LuhnError::EmptyString => write!(f, "string cannot be empty"),
+            LuhnError::ContainsSpaces => write!(f, "string cannot contain spaces"),
+            LuhnError::NegativeNumber => write!(f, "negative numbers are not allowed"),
+            LuhnError::FloatingPoint => write!(f, "floating point numbers are not allowed"),
+            LuhnError::NonNumeric => write!(f, "string must be convertible to a number"),
+            LuhnError::InvalidLength(msg) => write!(f, "{}", msg),
+            LuhnError::ParseError(msg) => write!(f, "{}", msg),
+        }
+    }
+}
+
+impl Error for LuhnError {}
 
 /// Validates input string against common error conditions.
 ///
@@ -34,25 +71,25 @@ pub struct GenerateOptions {
 /// # Returns
 /// * `Ok(())` if validation passes
 /// * `Err(String)` with error message if validation fails
-fn handle_errors(value: &str) -> Result<(), String> {
+fn handle_errors(value: &str) -> Result<(), LuhnError> {
     if value.is_empty() {
-        return Err("string cannot be empty".to_string());
+        return Err(LuhnError::EmptyString);
     }
 
     if value.contains(' ') {
-        return Err("string cannot contain spaces".to_string());
+        return Err(LuhnError::ContainsSpaces);
     }
 
     if value.contains('-') {
-        return Err("negative numbers are not allowed".to_string());
+        return Err(LuhnError::NegativeNumber);
     }
 
     if value.contains('.') {
-        return Err("floating point numbers are not allowed".to_string());
+        return Err(LuhnError::FloatingPoint);
     }
 
     if !value.chars().all(|c| c.is_ascii_digit()) {
-        return Err("string must be convertible to a number".to_string());
+        return Err(LuhnError::NonNumeric);
     }
 
     Ok(())
@@ -124,7 +161,7 @@ fn generate_checksum(value: &str) -> u8 {
 /// * The input contains negative numbers
 /// * The input contains floating point numbers
 /// * The input contains non-numeric characters
-pub fn generate(value: &str, options: Option<GenerateOptions>) -> Result<String, String> {
+pub fn generate(value: &str, options: Option<GenerateOptions>) -> Result<String, LuhnError> {
     handle_errors(value)?;
 
     let checksum = generate_checksum(value);
@@ -160,11 +197,13 @@ pub fn generate(value: &str, options: Option<GenerateOptions>) -> Result<String,
 /// * The input contains floating point numbers
 /// * The input contains non-numeric characters
 /// * The input is only one character long
-pub fn validate(value: &str) -> Result<bool, String> {
+pub fn validate(value: &str) -> Result<bool, LuhnError> {
     handle_errors(value)?;
 
     if value.len() == 1 {
-        return Err("string must be longer than 1 character".to_string());
+        return Err(LuhnError::InvalidLength(
+            "string must be longer than 1 character".to_string()
+        ));
     }
 
     let (value_without_checksum, _) = value.split_at(value.len() - 1);
@@ -195,38 +234,50 @@ pub fn validate(value: &str) -> Result<bool, String> {
 /// * The length string contains non-numeric characters
 /// * The requested length is less than 2
 /// * The requested length is greater than 100
-pub fn random(length: &str) -> Result<String, String> {
+pub fn random(length: &str) -> Result<String, LuhnError> {
     handle_errors(length)?;
 
     let length_as_int: usize = length.parse()
-        .map_err(|_| "failed to parse length")?;
+        .map_err(|_| LuhnError::ParseError("failed to parse length".to_string()))?;
 
     if length_as_int > 100 {
-        return Err("string must be less than 100 characters".to_string());
+        return Err(LuhnError::InvalidLength(
+            "string must be less than 100 characters".to_string()
+        ));
     }
 
     if length_as_int < 2 {
-        return Err("string must be greater than 1".to_string());
+        return Err(LuhnError::InvalidLength(
+            "string must be greater than 1".to_string()
+        ));
     }
 
     use rand::Rng;
     let mut rng = rand::thread_rng();
     
     let mut random = String::with_capacity(length_as_int - 1);
-    
-    // First digit (1-9)
-    random.push(char::from_digit(rng.gen_range(0..10), 10).unwrap());
-    
-    // Remaining digits (0-9)
-    for _ in 1..(length_as_int - 1) {
-        random.push(char::from_digit(rng.gen_range(0..10), 10).unwrap());
-    }
 
-    generate(&random, None)
+    loop {
+        random.clear();
+        
+        // Generate all digits randomly (0-9)
+        for _ in 0..(length_as_int - 1) {
+            random.push(char::from_digit(rng.gen_range(0..10), 10).unwrap());
+        }
+        
+        // Add checksum and check if valid
+        if let Ok(result) = generate(&random, None) {
+            if validate(&result).unwrap_or(false) {
+                return Ok(result);
+            }
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashSet;
+
     use super::*;
 
     mod generate {
@@ -234,17 +285,18 @@ mod tests {
 
         #[test]
         fn test_error_cases() {
-            assert!(generate("", None).is_err());
-            assert!(generate("1a", None).is_err());
-            assert!(generate(" 123 ", None).is_err());
-            assert!(generate("-123", None).is_err());
-            assert!(generate("123.45", None).is_err());
+            assert_eq!(generate("", None).unwrap_err(), LuhnError::EmptyString);
+            assert_eq!(generate("1a", None).unwrap_err(), LuhnError::NonNumeric);
+            assert_eq!(generate(" 123 ", None).unwrap_err(), LuhnError::ContainsSpaces);
+            assert_eq!(generate("-123", None).unwrap_err(), LuhnError::NegativeNumber);
+            assert_eq!(generate("123.45", None).unwrap_err(), LuhnError::FloatingPoint);
         }
 
         #[test]
         fn test_generate_without_options() {
             assert_eq!(generate("1", None).unwrap(), "18");
             assert_eq!(generate("7992739871", None).unwrap(), "79927398713");
+            assert_eq!(generate("0123", None).unwrap(), "01230");
         }
 
         #[test]
@@ -289,12 +341,12 @@ mod tests {
 
         #[test]
         fn test_error_cases() {
-            assert!(validate("").is_err());
-            assert!(validate("1").is_err());
-            assert!(validate("1a").is_err());
-            assert!(validate(" 1230 ").is_err());
-            assert!(validate("-1230").is_err());
-            assert!(validate("123.40").is_err());
+            assert_eq!(validate("").unwrap_err(), LuhnError::EmptyString);
+            assert_eq!(
+                validate("1").unwrap_err(),
+                LuhnError::InvalidLength("string must be longer than 1 character".to_string())
+            );
+            assert_eq!(validate("1a").unwrap_err(), LuhnError::NonNumeric);
         }
 
         #[test]
@@ -309,20 +361,26 @@ mod tests {
             assert!(validate("18").unwrap());
             assert!(validate("125").unwrap());
             assert!(validate("1230").unwrap());
+            assert!(validate("01230").unwrap());
             assert!(validate("001230").unwrap());
         }
     }
 
     mod random {
         use super::*;
-        use std::collections::HashSet;
 
         #[test]
         fn test_error_cases() {
-            assert!(random("").is_err());
-            assert!(random("1a").is_err());
-            assert!(random("1").is_err());
-            assert!(random("101").is_err());
+            assert_eq!(random("").unwrap_err(), LuhnError::EmptyString);
+            assert_eq!(random("1a").unwrap_err(), LuhnError::NonNumeric);
+            assert_eq!(
+                random("1").unwrap_err(),
+                LuhnError::InvalidLength("string must be greater than 1".to_string())
+            );
+            assert_eq!(
+                random("101").unwrap_err(),
+                LuhnError::InvalidLength("string must be less than 100 characters".to_string())
+            );
         }
 
         #[test]
@@ -356,6 +414,17 @@ mod tests {
             }
 
             let expected = iterations / 10;
+            let min_threshold = expected * 6 / 10;
+
+            println!("\nExpected count per digit: {}", expected);
+            println!("Minimum threshold (60%): {}\n", min_threshold);
+            println!("Actual counts per digit:");
+            for (digit, count) in counts.iter().enumerate() {
+                println!("Digit {}: {} {}", digit, count, 
+                    if *count < min_threshold { "<!- BELOW THRESHOLD" } else { "" });
+            }
+            println!("");
+
             for count in counts.iter() {
                 assert!(*count > (expected * 6 / 10)); // Within 40% below expected
                 assert!(*count < (expected * 14 / 10)); // Within 40% above expected
