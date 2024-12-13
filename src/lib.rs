@@ -1,8 +1,39 @@
+//! Luhn algorithm implementation in Rust.
+//!
+//! This crate provides functionality to generate and validate numbers using the Luhn algorithm,
+//! commonly used for validating various identification numbers such as credit card numbers,
+//! Canadian Social Insurance Numbers, and other identification numbers.
+//!
+//! # Examples
+//!
+//! ```
+//! use luhn_rs::{generate, validate, GenerateOptions};
+//!
+//! // Generate a Luhn number
+//! let result = generate("7992739871", None).unwrap();
+//! assert_eq!(result, "79927398713");
+//!
+//! // Validate a Luhn number
+//! let is_valid = validate("79927398713").unwrap();
+//! assert!(is_valid);
+//! ```
+
+/// Configuration options for generating Luhn numbers.
 #[derive(Default, Clone)]  // Added Clone here
 pub struct GenerateOptions {
+    /// If true, returns only the checksum digit.
+    /// If false, returns the original number with the checksum digit appended.
     pub checksum_only: bool,
 }
 
+/// Validates input string against common error conditions.
+///
+/// # Arguments
+/// * `value` - The string to validate
+///
+/// # Returns
+/// * `Ok(())` if validation passes
+/// * `Err(String)` with error message if validation fails
 fn handle_errors(value: &str) -> Result<(), String> {
     if value.is_empty() {
         return Err("string cannot be empty".to_string());
@@ -27,6 +58,16 @@ fn handle_errors(value: &str) -> Result<(), String> {
     Ok(())
 }
 
+/// Calculates the Luhn checksum for a given numeric string.
+///
+/// # Arguments
+/// * `value` - A string slice containing only numeric characters
+///
+/// # Returns
+/// * `u8` - The calculated checksum digit
+///
+/// # Panics
+/// * Panics if the input string contains non-numeric characters
 fn generate_checksum(value: &str) -> u8 {
     let mut double = true;
     let sum: u32 = value
@@ -52,6 +93,37 @@ fn generate_checksum(value: &str) -> u8 {
     ((10 - (sum % 10)) % 10) as u8
 }
 
+/// Generates a Luhn number or checksum from the input value.
+///
+/// # Arguments
+/// * `value` - A string slice that holds the number to process
+/// * `options` - Optional configuration for generation
+///
+/// # Returns
+/// * `Ok(String)` - The generated Luhn number or checksum
+/// * `Err(String)` - Error message if validation fails
+///
+/// # Examples
+/// ```
+/// use luhn_rs::{generate, GenerateOptions};
+///
+/// // Generate full Luhn number
+/// let result = generate("7992739871", None).unwrap();
+/// assert_eq!(result, "79927398713");
+///
+/// // Generate only checksum
+/// let options = Some(GenerateOptions { checksum_only: true });
+/// let checksum = generate("7992739871", options).unwrap();
+/// assert_eq!(checksum, "3");
+/// ```
+///
+/// # Errors
+/// Returns an error if:
+/// * The input string is empty
+/// * The input contains spaces
+/// * The input contains negative numbers
+/// * The input contains floating point numbers
+/// * The input contains non-numeric characters
 pub fn generate(value: &str, options: Option<GenerateOptions>) -> Result<String, String> {
     handle_errors(value)?;
 
@@ -63,6 +135,31 @@ pub fn generate(value: &str, options: Option<GenerateOptions>) -> Result<String,
     })
 }
 
+/// Validates whether a number satisfies the Luhn algorithm.
+///
+/// # Arguments
+/// * `value` - A string slice that holds the number to validate
+///
+/// # Returns
+/// * `Ok(bool)` - True if the number is valid, false otherwise
+/// * `Err(String)` - Error message if validation fails
+///
+/// # Examples
+/// ```
+/// use luhn_rs::validate;
+///
+/// assert!(validate("79927398713").unwrap());
+/// assert!(!validate("79927398714").unwrap());
+/// ```
+///
+/// # Errors
+/// Returns an error if:
+/// * The input string is empty
+/// * The input contains spaces
+/// * The input contains negative numbers
+/// * The input contains floating point numbers
+/// * The input contains non-numeric characters
+/// * The input is only one character long
 pub fn validate(value: &str) -> Result<bool, String> {
     handle_errors(value)?;
 
@@ -74,6 +171,30 @@ pub fn validate(value: &str) -> Result<bool, String> {
     Ok(value == generate(value_without_checksum, None)?)
 }
 
+/// Generates a random number of specified length with a valid Luhn checksum.
+///
+/// # Arguments
+/// * `length` - A string slice containing the desired length of the number
+///
+/// # Returns
+/// * `Ok(String)` - A random number of the specified length with valid Luhn checksum
+/// * `Err(String)` - Error message if validation fails
+///
+/// # Examples
+/// ```
+/// use luhn_rs::{random, validate};
+///
+/// let random_number = random("10").unwrap();
+/// assert_eq!(random_number.len(), 10);
+/// assert!(validate(&random_number).unwrap());
+/// ```
+///
+/// # Errors
+/// Returns an error if:
+/// * The length string is empty
+/// * The length string contains non-numeric characters
+/// * The requested length is less than 2
+/// * The requested length is greater than 100
 pub fn random(length: &str) -> Result<String, String> {
     handle_errors(length)?;
 
