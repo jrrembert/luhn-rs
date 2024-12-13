@@ -94,7 +94,7 @@ pub fn random(length: &str) -> Result<String, String> {
     let mut random = String::with_capacity(length_as_int - 1);
     
     // First digit (1-9)
-    random.push(char::from_digit(rng.gen_range(1..10), 10).unwrap());
+    random.push(char::from_digit(rng.gen_range(0..10), 10).unwrap());
     
     // Remaining digits (0-9)
     for _ in 1..(length_as_int - 1) {
