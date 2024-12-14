@@ -7,7 +7,7 @@
 //! # Examples
 //!
 //! ```
-//! use luhn_rs::{generate, validate, GenerateOptions};
+//! use luhn_tools::{generate, validate, GenerateOptions};
 //!
 //! // Generate a Luhn number
 //! let result = generate("7992739871", None).unwrap();
@@ -142,7 +142,7 @@ fn generate_checksum(value: &str) -> u8 {
 ///
 /// # Examples
 /// ```
-/// use luhn_rs::{generate, GenerateOptions};
+/// use luhn_tools::{generate, GenerateOptions};
 ///
 /// // Generate full Luhn number
 /// let result = generate("7992739871", None).unwrap();
@@ -183,7 +183,7 @@ pub fn generate(value: &str, options: Option<GenerateOptions>) -> Result<String,
 ///
 /// # Examples
 /// ```
-/// use luhn_rs::validate;
+/// use luhn_tools::validate;
 ///
 /// assert!(validate("79927398713").unwrap());
 /// assert!(!validate("79927398714").unwrap());
@@ -221,7 +221,7 @@ pub fn validate(value: &str) -> Result<bool, LuhnError> {
 ///
 /// # Examples
 /// ```
-/// use luhn_rs::{random, validate};
+/// use luhn_tools::{random, validate};
 ///
 /// let random_number = random("10").unwrap();
 /// assert_eq!(random_number.len(), 10);

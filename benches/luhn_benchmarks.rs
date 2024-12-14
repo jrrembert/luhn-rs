@@ -1,5 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use luhn_rs::{generate, random, validate, GenerateOptions};
+use luhn_tools::{generate, random, validate, GenerateOptions};
 
 fn benchmark_generate(c: &mut Criterion) {
     let mut group = c.benchmark_group("generate");

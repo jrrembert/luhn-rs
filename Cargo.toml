@@ -2,7 +2,7 @@
 name = "luhn_tools"
 rust-version = "1.65.0"
 edition = "2021"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Ryan Rembert <j.ryan.rembert@gmail.com>"]
 description = "A fast, minimal implementation of the Luhn algorithm."
 license = "MIT"
