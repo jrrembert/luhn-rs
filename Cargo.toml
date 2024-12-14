@@ -2,7 +2,7 @@
 name = "luhn_tools"
 rust-version = "1.65.0"
 edition = "2021"
-version = "0.2.1"
+version = "0.3.0"
 authors = ["Ryan Rembert <j.ryan.rembert@gmail.com>"]
 description = "A fast, minimal implementation of the Luhn algorithm."
 license = "MIT"
@@ -19,8 +19,13 @@ exclude = [
     "/.gitignore",
 ]
 
+[features]
+default = ["std"]      # Default features
+std = []               # Standard library support
+random = ["dep:rand"]  # Random number generation
+
 [dependencies]
-rand = "0.8"
+rand = { version = "0.8", optional = true }
 
 [dev-dependencies]
 criterion = { version = "0.5", features = ["html_reports"] }

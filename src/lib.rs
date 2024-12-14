@@ -18,6 +18,8 @@
 //! assert!(is_valid);
 //! ```
 
+#![cfg_attr(not(feature = "std"), no_std)] // Allow no_std usage
+
 use std::error::Error;
 use std::fmt;
 
@@ -161,6 +163,7 @@ fn generate_checksum(value: &str) -> u8 {
 /// * The input contains negative numbers
 /// * The input contains floating point numbers
 /// * The input contains non-numeric characters
+#[cfg(feature = "std")]
 pub fn generate(value: &str, options: Option<GenerateOptions>) -> Result<String, LuhnError> {
     handle_errors(value)?;
 
@@ -197,6 +200,7 @@ pub fn generate(value: &str, options: Option<GenerateOptions>) -> Result<String,
 /// * The input contains floating point numbers
 /// * The input contains non-numeric characters
 /// * The input is only one character long
+#[cfg(feature = "std")]
 pub fn validate(value: &str) -> Result<bool, LuhnError> {
     handle_errors(value)?;
 
@@ -234,6 +238,7 @@ pub fn validate(value: &str) -> Result<bool, LuhnError> {
 /// * The length string contains non-numeric characters
 /// * The requested length is less than 2
 /// * The requested length is greater than 100
+#[cfg(all(feature = "random", feature = "std"))]
 pub fn random(length: &str) -> Result<String, LuhnError> {
     handle_errors(length)?;
 
@@ -277,10 +282,12 @@ pub fn random(length: &str) -> Result<String, LuhnError> {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashSet;
-
     use super::*;
 
+    #[cfg(feature = "random")]
+    use std::collections::HashSet;
+    
+    #[cfg(feature = "std")]
     mod generate {
         use super::*;
 
@@ -353,6 +360,7 @@ mod tests {
         }
     }
 
+    #[cfg(feature = "std")]
     mod validate {
         use super::*;
 
@@ -383,6 +391,7 @@ mod tests {
         }
     }
 
+    #[cfg(all(feature = "random", feature = "std"))]
     mod random {
         use super::*;
 

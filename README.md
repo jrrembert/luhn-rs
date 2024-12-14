@@ -2,27 +2,32 @@
 
 [![CI](https://github.com/jrrembert/luhn_rs/workflows/CI/badge.svg)](https://github.com/jrrembert/luhn_rs/actions)
 [![codecov](https://codecov.io/gh/jrrembert/luhn_rs/branch/main/graph/badge.svg)](https://codecov.io/gh/jrrembert/luhn_rs)
-[![Crates.io](https://img.shields.io/crates/v/luhn_tools.svg)](https://crates.io/crates/luhn_toolss)
+[![Crates.io](https://img.shields.io/crates/v/luhn_tools.svg)](https://crates.io/crates/luhn_tools)
 [![Documentation](https://docs.rs/luhn_tools/badge.svg)](https://docs.rs/luhn_tools)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Minimum Supported Rust Version](https://img.shields.io/badge/MSRV-1.65.0-blue.svg)](https://github.com/jrrembert/luhn_rs)
 
 A fast, minimal implementation of the Luhn algorithm.
 
-- Generate Luhn numbers
+- Generate checksums for Luhn numbers
 - Validate Luhn numbers
 - Generate random valid Luhn numbers
-- No dependencies (except rand for random generation)
+- No dependencies (optionally includes `rand` for random generation)
 - Comprehensive error handling
-- Fully tested and benchmarked
+- Tested and benchmarked
 
 ## Installation
 
-Add this to your `Cargo.toml`:
+Add one of these to your `Cargo.toml`:
 
 ```toml
+# Option 1: Use defaults (includes `std`)
 [dependencies]
-luhn_tools = "0.2.1"
+luhn_algo = "0.3.0"
+
+# Option 2: Include `random` feature
+[dependencies]
+luhn_algo = { version = "0.3.0", features = ["random"] }
 ```
 
 ## Usage
@@ -52,7 +57,7 @@ assert!(validate(&random_number).unwrap());
 $ cargo doc --no-deps --open
 
 # run tests
-$ cargo test
+$ cargo test --all-features
 
 # run benchmarks
 $ cargo bench
