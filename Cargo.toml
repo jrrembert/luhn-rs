@@ -1,5 +1,5 @@
 [package]
-name = "luhn_rs"
+name = "luhn_tools"
 rust-version = "1.65.0"
 edition = "2021"
 version = "0.2.0"
