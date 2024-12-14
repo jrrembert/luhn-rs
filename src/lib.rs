@@ -24,14 +24,14 @@ use std::error::Error;
 use std::fmt;
 
 /// Configuration options for generating Luhn numbers.
-#[derive(Default, Clone)] // Added Clone here
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub struct GenerateOptions {
     /// If true, returns only the checksum digit.
     /// If false, returns the original number with the checksum digit appended.
     pub checksum_only: bool,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LuhnError {
     /// Input string is empty
     EmptyString,
@@ -321,18 +321,15 @@ mod tests {
             let options = Some(GenerateOptions {
                 checksum_only: false,
             });
-            assert_eq!(generate("1", options.clone()).unwrap(), "18");
-            assert_eq!(generate("12", options.clone()).unwrap(), "125");
-            assert_eq!(generate("123", options.clone()).unwrap(), "1230");
-            assert_eq!(generate("1234", options.clone()).unwrap(), "12344");
-            assert_eq!(generate("12345", options.clone()).unwrap(), "123455");
-            assert_eq!(generate("123456", options.clone()).unwrap(), "1234566");
-            assert_eq!(generate("1234567", options.clone()).unwrap(), "12345674");
-            assert_eq!(generate("12345678", options.clone()).unwrap(), "123456782");
-            assert_eq!(
-                generate("123456789", options.clone()).unwrap(),
-                "1234567897"
-            );
+            assert_eq!(generate("1", options).unwrap(), "18");
+            assert_eq!(generate("12", options).unwrap(), "125");
+            assert_eq!(generate("123", options).unwrap(), "1230");
+            assert_eq!(generate("1234", options).unwrap(), "12344");
+            assert_eq!(generate("12345", options).unwrap(), "123455");
+            assert_eq!(generate("123456", options).unwrap(), "1234566");
+            assert_eq!(generate("1234567", options).unwrap(), "12345674");
+            assert_eq!(generate("12345678", options).unwrap(), "123456782");
+            assert_eq!(generate("123456789", options).unwrap(), "1234567897");
             assert_eq!(generate("7992739871", options).unwrap(), "79927398713");
         }
 
@@ -341,15 +338,15 @@ mod tests {
             let options = Some(GenerateOptions {
                 checksum_only: true,
             });
-            assert_eq!(generate("1", options.clone()).unwrap(), "8");
-            assert_eq!(generate("12", options.clone()).unwrap(), "5");
-            assert_eq!(generate("123", options.clone()).unwrap(), "0");
-            assert_eq!(generate("1234", options.clone()).unwrap(), "4");
-            assert_eq!(generate("12345", options.clone()).unwrap(), "5");
-            assert_eq!(generate("123456", options.clone()).unwrap(), "6");
-            assert_eq!(generate("1234567", options.clone()).unwrap(), "4");
-            assert_eq!(generate("12345678", options.clone()).unwrap(), "2");
-            assert_eq!(generate("123456789", options.clone()).unwrap(), "7");
+            assert_eq!(generate("1", options).unwrap(), "8");
+            assert_eq!(generate("12", options).unwrap(), "5");
+            assert_eq!(generate("123", options).unwrap(), "0");
+            assert_eq!(generate("1234", options).unwrap(), "4");
+            assert_eq!(generate("12345", options).unwrap(), "5");
+            assert_eq!(generate("123456", options).unwrap(), "6");
+            assert_eq!(generate("1234567", options).unwrap(), "4");
+            assert_eq!(generate("12345678", options).unwrap(), "2");
+            assert_eq!(generate("123456789", options).unwrap(), "7");
             assert_eq!(generate("7992739871", options).unwrap(), "3");
         }
 

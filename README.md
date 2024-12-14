@@ -1,11 +1,11 @@
-# luhn_rs
+# luhn-rs
 
-[![CI](https://github.com/jrrembert/luhn_rs/workflows/CI/badge.svg)](https://github.com/jrrembert/luhn_rs/actions)
-[![codecov](https://codecov.io/gh/jrrembert/luhn_rs/branch/main/graph/badge.svg)](https://codecov.io/gh/jrrembert/luhn_rs)
+[![CI](https://github.com/jrrembert/luhn-rs/workflows/CI/badge.svg)](https://github.com/jrrembert/luhn-rs/actions)
+[![codecov](https://codecov.io/gh/jrrembert/luhn-rs/branch/main/graph/badge.svg)](https://codecov.io/gh/jrrembert/luhn-rs)
 [![Crates.io](https://img.shields.io/crates/v/luhn_tools.svg)](https://crates.io/crates/luhn_tools)
 [![Documentation](https://docs.rs/luhn_tools/badge.svg)](https://docs.rs/luhn_tools)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Minimum Supported Rust Version](https://img.shields.io/badge/MSRV-1.65.0-blue.svg)](https://github.com/jrrembert/luhn_rs)
+[![Minimum Supported Rust Version](https://img.shields.io/badge/MSRV-1.65.0-blue.svg)](https://github.com/jrrembert/luhn-rs)
 
 A fast, minimal implementation of the Luhn algorithm.
 
