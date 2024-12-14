@@ -286,7 +286,7 @@ mod tests {
 
     #[cfg(feature = "random")]
     use std::collections::HashSet;
-    
+
     #[cfg(feature = "std")]
     mod generate {
         use super::*;
