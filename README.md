@@ -9,6 +9,8 @@
 
 A fast, minimal implementation of the Luhn algorithm.
 
+## Features
+
 - Generate checksums for Luhn numbers
 - Validate Luhn numbers
 - Generate random valid Luhn numbers
@@ -51,6 +53,8 @@ assert!(validate("79927398713").unwrap());
 let random_number = random("10").unwrap();
 assert!(validate(&random_number).unwrap());
 ```
+
+## Development
 
 ```bash
 # view docs
