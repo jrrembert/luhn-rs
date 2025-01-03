@@ -75,4 +75,4 @@ Contributions welcome! Please feel free to submit a Pull Request.
 
 [MIT](LICENSE)
 
-Copyright © 2009 J. Ryan Rembert
+Copyright © 2024-2025 J. Ryan Rembert
